@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="zh-HK" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>雙城財富 Pro | SZ-HK Wealth & Options</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#131c2e',
+                            925: '#0a0f1d',
+                            950: '#060913',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hide scrollbars for sleek mobile experience */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        input, textarea {
+            user-select: text;
+        }
+        /* Glassmorphism effects */
+        .glass-panel {
+            background: rgba(19, 28, 46, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-nav {
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Dynamic Island & Home Indicator safe areas */
+        .pt-safe {
+            padding-top: max(1rem, env(safe-area-inset-top));
+        }
+        .pb-safe {
+            padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex justify-center items-start lg:py-6 lg:bg-slate-900">
+
+    <!-- iPhone 15 Pro Max Frame (430px width on desktop, 100% on mobile) -->
+    <div id="app-frame" class="w-full max-w-[430px] min-h-screen lg:min-h-[932px] lg:h-[932px] bg-slate-950 lg:rounded-[52px] lg:border-[10px] lg:border-slate-800 lg:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.85)] relative flex flex-col overflow-hidden">
+        
+        <!-- Ambient Background Glow -->
+        <div class="absolute top-[-10%] left-[-15%] w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-[25%] right-[-20%] w-72 h-72 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- iOS Status Bar & Dynamic Island -->
+        <div class="pt-3 px-7 pb-2 flex justify-between items-center z-30 select-none shrink-0">
+            <span id="ios-clock" class="text-[13px] font-semibold tracking-tight font-mono text-slate-200">09:41</span>
+            
+            <!-- Dynamic Island Interactive Pill -->
+            <div onclick="openModal('fx-modal')" class="bg-black border border-white/10 rounded-full px-3.5 py-1 flex items-center gap-2 cursor-pointer active:scale-95 transition-transform shadow-lg">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[11px] font-mono text-slate-300 tracking-tighter" id="island-fx-display">¥1 = HK$1.086</span>
+                <i data-lucide="RefreshCw" class="w-2.5 h-2.5 text-slate-400"></i>
+            </div>
+
+            <div class="flex items-center gap-1.5 text-slate-200">
+                <i data-lucide="signal" class="w-3.5 h-3.5"></i>
+                <span class="text-[10px] font-bold">5G</span>
+                <i data-lucide="battery-full" class="w-4 h-4 text-emerald-400"></i>
+            </div>
+        </div>
+
+        <!-- Top App Header & Global Net Worth Banner -->
+        <header class="px-5 pt-2 pb-3 z-20 shrink-0">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
+                            <i data-lucide="train" class="w-3 h-3"></i> 深港雙城模式
+                        </span>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
+                            Short 期權
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- Base Currency Toggle -->
+                    <button onclick="cycleBaseCurrency()" id="base-curr-btn" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono font-semibold text-indigo-400 flex items-center gap-1 active:scale-95 transition">
+                        <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                        <span id="base-curr-label">計價: HKD</span>
+                    </button>
+                    <button onclick="openModal('fx-modal')" class="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white active:scale-95 transition" title="匯率設定">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="openModal('share-modal')" class="px-2.5 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-xs font-semibold text-emerald-300 flex items-center gap-1 active:scale-95 transition shadow-lg shadow-emerald-950/50" title="透過 GitHub 發佈及分享連結">
+                        <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                        <span>GitHub 發佈</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hero Net Worth Card -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950/90 via-slate-900/95 to-slate-900 border border-indigo-500/25 p-4 shadow-xl">
+                <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+                    <i data-lucide="landmark" class="w-32 h-32 text-indigo-300"></i>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-slate-400 flex items-center gap-1.5">
+                            <span>跨幣種總淨資產 (折合 <span id="hero-curr-code">HKD</span>)</span>
+                            <button onclick="togglePrivacy()" class="text-slate-400 hover:text-white">
+                                <i id="privacy-icon" data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </p>
+                        <h1 id="hero-net-worth" class="text-2xl font-bold font-mono tracking-tight mt-0.5 text-white">HK$ 1,284,560</h1>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[11px] text-slate-400 block">本月香港薪金結餘率</span>
+                        <span id="hero-savings-rate" class="text-sm font-mono font-bold text-emerald-400">+68.4%</span>
+                    </div>
+                </div>
+
+                <!-- Mini Sub-metrics inside Hero Card -->
+                <div class="grid grid-cols-3 gap-2 mt-3.5 pt-3 border-t border-white/10 text-xs">
+                    <div>
+                        <span class="text-slate-400 text-[11px] flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>深圳生活支出
+                        </span>
+                        <p id="hero-sz-spend" class="font-mono font-semibold text-slate-100 mt-0.5">¥ 8,420</p>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 text-[11px] flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>香港支出/稅貸
+                        </span>
+                        <p id="hero-hk-spend" class="font-mono font-semibold text-slate-100 mt-0.5">HK$ 6,150</p>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 text-[11px] flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>期權本月權利金
+                        </span>
+                        <p id="hero-opt-prem" class="font-mono font-semibold text-emerald-400 mt-0.5">+HK$ 14,820</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content Area -->
+        <main class="flex-1 overflow-y-auto px-5 pb-28 space-y-5 z-10" id="main-scroll">
+
+            <!-- ================= TAB 1: 深港收支與預算 (LIVING & BUDGET) ================= -->
+            <section id="tab-living" class="space-y-4">
+                
+                <!-- Dual-City Budget Progress Card -->
+                <div class="glass-panel rounded-3xl p-4 space-y-3.5">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                                <i data-lucide="compass" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-white">深港雙城月度預算</h2>
+                                <p class="text-[11px] text-slate-400">深圳高質生活 · 香港高薪工作</p>
+                            </div>
+                        </div>
+                        <button onclick="openModal('budget-modal')" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 bg-indigo-500/10 px-2.5 py-1 rounded-xl border border-indigo-500/20">
+                            <i data-lucide="Sliders" class="w-3 h-3"></i> 調整預算
+                        </button>
+                    </div>
+
+                    <!-- Shenzhen CNY Budget Bar -->
+                    <div class="bg-slate-900/90 rounded-2xl p-3 border border-white/5">
+                        <div class="flex justify-between items-center text-xs mb-1.5">
+                            <span class="font-medium text-slate-200 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 text-[10px] rounded bg-rose-500/20 text-rose-300 font-mono">CNY</span>
+                                深圳生活預算 (福田租屋/山姆/美團/滴滴)
+                            </span>
+                            <span id="sz-budget-pct" class="font-mono text-rose-400 font-semibold">70%</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="sz-budget-bar" class="h-full bg-gradient-to-r from-rose-500 to-amber-500 rounded-full transition-all duration-500" style="width: 70%"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1.5 font-mono">
+                            <span id="sz-budget-spent">已用: ¥ 8,420</span>
+                            <span id="sz-budget-limit">預算: ¥ 12,000</span>
+                        </div>
+                    </div>
+
+                    <!-- Hong Kong HKD Budget Bar -->
+                    <div class="bg-slate-900/90 rounded-2xl p-3 border border-white/5">
+                        <div class="flex justify-between items-center text-xs mb-1.5">
+                            <span class="font-medium text-slate-200 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 text-[10px] rounded bg-indigo-500/20 text-indigo-300 font-mono">HKD</span>
+                                香港通勤及日常 (高鐵/八達通/中環午餐)
+                            </span>
+                            <span id="hk-budget-pct" class="font-mono text-indigo-400 font-semibold">61%</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="hk-budget-bar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all duration-500" style="width: 61%"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1.5 font-mono">
+                            <span id="hk-budget-spent">已用: HK$ 6,150</span>
+                            <span id="hk-budget-limit">預算: HK$ 10,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick 1-Tap Cross-Border Presets -->
+                <div>
+                    <div class="flex justify-between items-center mb-2 px-1">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> 深港高頻一鍵記賬
+                        </span>
+                        <span class="text-[11px] text-slate-500">點擊即快速入賬</span>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-1">
+                        <button onclick="quickRecordExpense('西九龍⇄福田高鐵', 75, 'HKD', 'HK', 'train', 'hsbc-pulse')" class="shrink-0 px-3 py-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 active:scale-95 transition flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                                <i data-lucide="train" class="w-4 h-4"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-semibold text-slate-200">高鐵福田⇄西九</p>
+                                <p class="text-[10px] font-mono text-indigo-400">-HK$ 75</p>
+                            </div>
+                        </button>
+
+                        <button onclick="quickRecordExpense('深圳地鐵/滴滴出行', 18, 'CNY', 'SZ', 'car', 'wechat-sz')" class="shrink-0 px-3 py-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-rose-500/40 active:scale-95 transition flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                                <i data-lucide="car" class="w-4 h-4"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-semibold text-slate-200">深圳滴滴/地鐵</p>
+                                <p class="text-[10px] font-mono text-rose-400">-¥ 18</p>
+                            </div>
+                        </button>
+
+                        <button onclick="quickRecordExpense('山姆超市極速達採購', 360, 'CNY', 'SZ', 'shopping-cart', 'cmb-card')" class="shrink-0 px-3 py-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-emerald-500/40 active:scale-95 transition flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-semibold text-slate-200">山姆會員店採購</p>
+                                <p class="text-[10px] font-mono text-rose-400">-¥ 360</p>
+                            </div>
+                        </button>
+
+                        <button onclick="quickRecordExpense('中環工作日午餐', 98, 'HKD', 'HK', 'utensils', 'mox-card')" class="shrink-0 px-3 py-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 active:scale-95 transition flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                                <i data-lucide="utensils" class="w-4 h-4"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-semibold text-slate-200">香港工作日午餐</p>
+                                <p class="text-[10px] font-mono text-indigo-400">-HK$ 98</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter & Add Transaction Header -->
+                <div class="flex justify-between items-center pt-1">
+                    <div class="flex bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs">
+                        <button onclick="setTxFilter('ALL')" id="tx-filter-ALL" class="px-3 py-1 rounded-xl bg-indigo-600 text-white font-medium transition">全部</button>
+                        <button onclick="setTxFilter('SZ')" id="tx-filter-SZ" class="px-3 py-1 rounded-xl text-slate-400 hover:text-white transition">深圳 (¥)</button>
+                        <button onclick="setTxFilter('HK')" id="tx-filter-HK" class="px-3 py-1 rounded-xl text-slate-400 hover:text-white transition">香港 (HK$)</button>
+                    </div>
+                    <button onclick="openModal('tx-modal')" class="px-3 py-1.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 active:scale-95 transition">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增收支
+                    </button>
+                </div>
+
+                <!-- Living Transactions List -->
+                <div id="living-tx-list" class="space-y-2.5">
+                    <!-- Rendered dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- ================= TAB 2: 信用卡還款管理 (CREDIT CARDS) ================= -->
+            <section id="tab-cards" class="space-y-4 hidden">
+                <!-- Credit Cards Summary Banner -->
+                <div class="glass-panel rounded-3xl p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-white">深港信用卡賬單總覽</h2>
+                                <p class="text-[11px] text-slate-400">北上回贈卡 · 內地生活卡到期追蹤</p>
+                            </div>
+                        </div>
+                        <button onclick="openModal('add-card-modal')" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium flex items-center gap-1 border border-white/10">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增卡片
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 bg-slate-900/90 rounded-2xl p-3 border border-white/5">
+                        <div>
+                            <span class="text-[11px] text-slate-400">香港信用卡待還總額</span>
+                            <p id="cards-hkd-unpaid" class="text-base font-mono font-bold text-amber-400 mt-0.5">HK$ 18,450</p>
+                        </div>
+                        <div class="border-l border-white/10 pl-3">
+                            <span class="text-[11px] text-slate-400">內地信用卡待還總額</span>
+                            <p id="cards-cny-unpaid" class="text-base font-mono font-bold text-rose-400 mt-0.5">¥ 6,280</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credit Cards Stack -->
+                <div id="credit-cards-list" class="space-y-3.5">
+                    <!-- Dynamically rendered via JS -->
+                </div>
+            </section>
+
+            <!-- ================= TAB 3: 資產戶口與跨境流水 (ASSETS & TRANSFERS) ================= -->
+            <section id="tab-assets" class="space-y-4 hidden">
+                <!-- Action Bar for Cross-border Remittance / Account Transfer -->
+                <div class="glass-panel rounded-3xl p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                                <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-white">全戶口資產與跨境調撥</h2>
+                                <p class="text-[11px] text-slate-400">香港銀行 · 深圳銀行 · 券商保證金</p>
+                            </div>
+                        </div>
+                        <button onclick="openModal('transfer-modal')" class="px-3 py-1.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 active:scale-95 transition">
+                            <i data-lucide="repeat" class="w-3.5 h-3.5"></i> 戶口轉賬/換匯
+                        </button>
+                    </div>
+
+                    <!-- Asset Distribution Mini Bar -->
+                    <div class="space-y-1.5 pt-1">
+                        <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                            <span id="asset-dist-hk">香港銀行 (34%)</span>
+                            <span id="asset-dist-sz">深圳戶口 (12%)</span>
+                            <span id="asset-dist-broker">港美券商 (54%)</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden flex p-0.5 gap-0.5 border border-white/5">
+                            <div id="bar-dist-hk" class="bg-indigo-500 h-full rounded-l-full" style="width: 34%"></div>
+                            <div id="bar-dist-sz" class="bg-rose-500 h-full" style="width: 12%"></div>
+                            <div id="bar-dist-broker" class="bg-emerald-500 h-full rounded-r-full" style="width: 54%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Groups (HK Banks, SZ Wallets, Brokers) -->
+                <div id="accounts-group-container" class="space-y-4">
+                    <!-- Dynamically rendered via JS -->
+                </div>
+
+                <!-- Recent Asset Transfer Flows -->
+                <div class="glass-panel rounded-3xl p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <i data-lucide="history" class="w-3.5 h-3.5 text-cyan-400"></i> 近期資金調撥及跨境匯款流水
+                        </h3>
+                    </div>
+                    <div id="transfer-history-list" class="space-y-2.5">
+                        <!-- Dynamically rendered via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 4: 港美股 SHORT OPTION 交易台 (OPTIONS DESK) ================= -->
+            <section id="tab-options" class="space-y-4 hidden">
+                
+                <!-- Short Option Wheel Strategy Summary Card -->
+                <div class="glass-panel rounded-3xl p-4 space-y-3.5 border-emerald-500/25">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h2 class="text-sm font-bold text-white">Short Option 權利金引擎</h2>
+                                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Theta Gang</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400">賣出港美股 Put/Call 收取時間價值現金流</p>
+                            </div>
+                        </div>
+                        <button onclick="openModal('option-modal')" class="px-3 py-1.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1 shadow-lg shadow-emerald-600/30 active:scale-95 transition">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新開 Short 倉
+                        </button>
+                    </div>
+
+                    <!-- KPI Grid for Short Options -->
+                    <div class="grid grid-cols-3 gap-2 bg-slate-900/90 rounded-2xl p-3 border border-white/5">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">本年已實現權利金</span>
+                            <p id="opt-realized-total" class="text-sm font-mono font-bold text-emerald-400 mt-0.5">+HK$ 68,420</p>
+                        </div>
+                        <div class="border-l border-white/10 pl-2.5">
+                            <span class="text-[10px] text-slate-400 block">未平倉潛在浮盈</span>
+                            <p id="opt-unrealized-total" class="text-sm font-mono font-bold text-cyan-400 mt-0.5">+HK$ 11,290</p>
+                        </div>
+                        <div class="border-l border-white/10 pl-2.5">
+                            <span class="text-[10px] text-slate-400 block">勝率 / 接貨次數</span>
+                            <p id="opt-winrate-stat" class="text-sm font-mono font-bold text-slate-100 mt-0.5">91% <span class="text-[10px] text-amber-400 font-normal">(1接貨)</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Collateral Margin Usage Bar -->
+                    <div class="bg-slate-900/70 rounded-2xl p-3 border border-white/5 space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-300 flex items-center gap-1.5">
+                                <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+                                Short Put 接貨保證金佔用率 (Cash Secured)
+                            </span>
+                            <span id="opt-margin-pct" class="font-mono font-semibold text-emerald-400">42.5% 安全</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="opt-margin-bar" class="h-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-amber-500 rounded-full transition-all duration-500" style="width: 42.5%"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                            <span id="opt-collateral-used">接貨最大敞口: HK$ 352,000</span>
+                            <span id="opt-broker-cash">券商總資產: HK$ 828,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market & Status Filter Pills -->
+                <div class="flex justify-between items-center">
+                    <div class="flex bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs">
+                        <button onclick="setOptFilter('OPEN')" id="opt-filter-OPEN" class="px-3 py-1 rounded-xl bg-emerald-600 text-white font-medium transition">持倉中 (Open)</button>
+                        <button onclick="setOptFilter('CLOSED')" id="opt-filter-CLOSED" class="px-3 py-1 rounded-xl text-slate-400 hover:text-white transition">已結算/接貨</button>
+                        <button onclick="setOptFilter('ALL')" id="opt-filter-ALL" class="px-3 py-1 rounded-xl text-slate-400 hover:text-white transition">全部</button>
+                    </div>
+                    <span class="text-[11px] text-slate-400 font-mono">支持 US / HK 期權</span>
+                </div>
+
+                <!-- Short Options Positions List -->
+                <div id="options-positions-list" class="space-y-3">
+                    <!-- Dynamically rendered via JS -->
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Tab Bar (iPhone 15 Pro Max Ergonomic Thumb Zone) -->
+        <nav class="glass-nav absolute bottom-0 inset-x-0 px-4 pt-2 pb-safe z-30">
+            <div class="grid grid-cols-4 gap-1">
+                <button onclick="switchTab('living')" id="nav-living" class="flex flex-col items-center py-1.5 rounded-2xl text-indigo-400 transition group">
+                    <div class="relative p-1 rounded-xl group-active:scale-90 transition">
+                        <i data-lucide="wallet" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold mt-0.5">深港收支</span>
+                </button>
+
+                <button onclick="switchTab('cards')" id="nav-cards" class="flex flex-col items-center py-1.5 rounded-2xl text-slate-400 hover:text-slate-200 transition group">
+                    <div class="relative p-1 rounded-xl group-active:scale-90 transition">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        <span id="nav-card-badge" class="absolute -top-0.5 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">2</span>
+                    </div>
+                    <span class="text-[11px] font-medium mt-0.5">信用卡還款</span>
+                </button>
+
+                <button onclick="switchTab('assets')" id="nav-assets" class="flex flex-col items-center py-1.5 rounded-2xl text-slate-400 hover:text-slate-200 transition group">
+                    <div class="relative p-1 rounded-xl group-active:scale-90 transition">
+                        <i data-lucide="landmark" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[11px] font-medium mt-0.5">資產流水</span>
+                </button>
+
+                <button onclick="switchTab('options')" id="nav-options" class="flex flex-col items-center py-1.5 rounded-2xl text-slate-400 hover:text-slate-200 transition group">
+                    <div class="relative p-1 rounded-xl group-active:scale-90 transition">
+                        <i data-lucide="candlestick-chart" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[11px] font-medium mt-0.5">Short期權</span>
+                </button>
+            </div>
+            <!-- iOS Home Indicator Bar -->
+            <div class="w-32 h-1 bg-white/25 rounded-full mx-auto mt-2"></div>
+        </nav>
+
+        <!-- Toast Feedback Banner -->
+        <div id="toast-banner" class="fixed lg:absolute top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/95 border border-emerald-500/40 text-emerald-300 text-xs font-medium shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-3">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+            <span id="toast-message">操作已完成</span>
+        </div>
+
+        <!-- ================= MODAL 1: 新增深港收支 (ADD TRANSACTION) ================= -->
+        <div id="tx-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4 animate-slide-up max-h-[88vh] overflow-y-auto">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-400"></i> 記錄深港收支
+                    </h3>
+                    <button onclick="closeModal('tx-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form id="tx-form" onsubmit="handleSaveTx(event)" class="space-y-3.5 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">收支類型</label>
+                            <select id="tx-type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+                                <option value="EXPENSE">支出 (Expense)</option>
+                                <option value="INCOME">收入/香港出糧 (Income)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">發生城市與幣種</label>
+                            <select id="tx-city-curr" onchange="syncTxCurrency()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+                                <option value="SZ_CNY">深圳消費 (CNY ¥)</option>
+                                <option value="HK_HKD">香港消費/收入 (HK$)</option>
+                                <option value="US_USD">美元收支 (USD $)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">金額</label>
+                            <input type="number" step="0.01" id="tx-amount" required placeholder="例如: 128.50" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">分類圖示</label>
+                            <select id="tx-category" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+                                <option value="home">🏠 深圳租屋/水電物管</option>
+                                <option value="utensils">🍜 餐飲/美團/喜茶</option>
+                                <option value="train">🚄 高鐵/地鐵/滴滴通勤</option>
+                                <option value="shopping-bag">🛒 山姆/盒馬/網購</option>
+                                <option value="briefcase">💼 香港薪金/花紅</option>
+                                <option value="heart-pulse">💆 深圳休閒/按摩/醫療</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-slate-400 block mb-1">項目描述</label>
+                        <input type="text" id="tx-title" required placeholder="例如：福田山姆超市採購 / 西九龍高鐵票" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="text-slate-400 block mb-1">扣款/入賬戶口或信用卡</label>
+                        <select id="tx-account" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 active:scale-98 transition">
+                        儲存收支記錄
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL 2: 信用卡還款確認 (PAY CREDIT CARD) ================= -->
+        <div id="pay-card-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i> 信用卡賬單還款
+                    </h3>
+                    <button onclick="closeModal('pay-card-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form id="pay-card-form" onsubmit="handleConfirmCardPayment(event)" class="space-y-3.5 text-xs">
+                    <input type="hidden" id="pay-card-id">
+                    <div class="p-3 rounded-2xl bg-slate-800/80 border border-white/5 flex justify-between items-center">
+                        <div>
+                            <p id="pay-card-name" class="text-sm font-bold text-white">HSBC Pulse 銀聯雙幣鑽石卡</p>
+                            <p id="pay-card-bill-info" class="text-[11px] text-slate-400 mt-0.5">本期結欠: HK$ 8,920</p>
+                        </div>
+                        <span id="pay-card-curr-badge" class="px-2 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-mono font-bold">HKD</span>
+                    </div>
+
+                    <div>
+                        <label class="text-slate-400 block mb-1">還款金額 (可全額或部分還款)</label>
+                        <input type="number" step="0.01" id="pay-card-amount" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm focus:outline-none focus:border-emerald-500">
+                    </div>
+
+                    <div>
+                        <label class="text-slate-400 block mb-1">選擇扣款銀行戶口 (自動折算匯率扣減餘額)</label>
+                        <select id="pay-card-source-acc" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-98 transition">
+                        確認還款並更新資產流水
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL 3: 新增信用卡 (ADD CREDIT CARD) ================= -->
+        <div id="add-card-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="credit-card" class="w-5 h-5 text-amber-400"></i> 新增深港信用卡
+                    </h3>
+                    <button onclick="closeModal('add-card-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form onsubmit="handleAddCard(event)" class="space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">發卡銀行及名稱</label>
+                            <input type="text" id="new-card-name" required placeholder="如: 中銀 Cheers Card" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">尾四位號碼</label>
+                            <input type="text" maxlength="4" id="new-card-last4" required placeholder="8899" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">結算幣種</label>
+                            <select id="new-card-curr" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white">
+                                <option value="HKD">HKD (港幣)</option>
+                                <option value="CNY">CNY (人民幣)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">信用額度</label>
+                            <input type="number" id="new-card-limit" required placeholder="100000" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">每月還款日</label>
+                            <input type="number" min="1" max="31" id="new-card-dueday" required placeholder="25" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">目前待還賬單金額</label>
+                            <input type="number" step="0.01" id="new-card-balance" required placeholder="4500" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">卡片主打優惠標籤</label>
+                            <input type="text" id="new-card-perk" required placeholder="北上消費 4.4% 回贈" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition">
+                        新增信用卡
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL 4: 戶口轉賬及跨境換匯 (ASSET TRANSFER) ================= -->
+        <div id="transfer-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="arrow-left-right" class="w-5 h-5 text-cyan-400"></i> 跨戶口轉賬 / 跨境匯款
+                    </h3>
+                    <button onclick="closeModal('transfer-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form onsubmit="handleTransferSubmit(event)" class="space-y-3.5 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">轉出戶口 (From)</label>
+                            <select id="tf-from-acc" onchange="updateTransferPreview()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2.5 text-white">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">轉入戶口 (To)</label>
+                            <select id="tf-to-acc" onchange="updateTransferPreview()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2.5 text-white">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">轉出金額</label>
+                            <input type="number" step="0.01" id="tf-amount" oninput="updateTransferPreview()" required placeholder="10000" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">預計到賬金額 (自動折算匯率)</label>
+                            <input type="text" id="tf-target-preview" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-emerald-400 font-mono text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-slate-400 block mb-1">轉賬備註 (如: 中銀香港同名匯款至深圳招行 / 富途入金)</label>
+                        <input type="text" id="tf-note" required placeholder="例如：發薪後跨境匯款補充深圳生活費" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white">
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-bold text-sm shadow-lg transition">
+                        執行轉賬並記錄流水
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL 5: 新增港美股 SHORT OPTION 交易 ================= -->
+        <div id="option-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-3.5 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="candlestick-chart" class="w-5 h-5 text-emerald-400"></i> 新增 Short Option 賣出期權倉位
+                    </h3>
+                    <button onclick="closeModal('option-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form onsubmit="handleAddOption(event)" class="space-y-3 text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">市場 (Market)</label>
+                            <select id="opt-market" onchange="handleOptMarketChange()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-semibold">
+                                <option value="US">🇺🇸 美股 (USD)</option>
+                                <option value="HK">🇭🇰 港股 (HKD)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">股票代號</label>
+                            <input type="text" id="opt-ticker" required placeholder="NVDA / 00700" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono uppercase">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">策略方向</label>
+                            <select id="opt-strategy" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-emerald-400 font-bold">
+                                <option value="SHORT_PUT">Short Put (賣跌)</option>
+                                <option value="SHORT_CALL">Short Call (賣升)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">行使價 (Strike)</label>
+                            <input type="number" step="0.01" id="opt-strike" oninput="calcOptPreview()" required placeholder="120" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">張數 (Contracts)</label>
+                            <input type="number" min="1" id="opt-contracts" value="1" oninput="calcOptPreview()" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">每張股數 (乘數)</label>
+                            <input type="number" id="opt-multiplier" value="100" oninput="calcOptPreview()" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-slate-300 font-mono">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">開倉權利金/股</label>
+                            <input type="number" step="0.01" id="opt-open-prem" oninput="calcOptPreview()" required placeholder="3.25" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-emerald-400 font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">現價/平倉價/股</label>
+                            <input type="number" step="0.01" id="opt-curr-prem" oninput="calcOptPreview()" required placeholder="0.85" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-cyan-400 font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Delta 值 (選填)</label>
+                            <input type="number" step="0.01" id="opt-delta" placeholder="-0.22" value="-0.22" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-400 block mb-1">到期日 (Expiry Date)</label>
+                            <input type="date" id="opt-expiry" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">交易券商戶口 (自動入賬權利金)</label>
+                            <select id="opt-broker-acc" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-white">
+                                <option value="futu-hk">富途證券 (Futu)</option>
+                                <option value="ibkr-pro">Interactive Brokers (IBKR)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Option Payoff Preview Box -->
+                    <div class="p-3 rounded-2xl bg-slate-950 border border-emerald-500/30 flex justify-between items-center">
+                        <div>
+                            <span class="text-[11px] text-slate-400 block">實收總權利金 (Open Credit)</span>
+                            <span id="opt-preview-credit" class="text-sm font-mono font-bold text-emerald-400">+$325.00</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] text-slate-400 block">接貨擔保金 / 打和點 (Breakeven)</span>
+                            <span id="opt-preview-collateral" class="text-xs font-mono text-amber-300">$12,000 | BE: $116.75</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition">
+                        建立 Short Option 倉位並收取權利金
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL 6: 匯率設定與雙城預算調整 ================= -->
+        <div id="fx-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="refresh-cw" class="w-5 h-5 text-indigo-400"></i> 跨境匯率設定 (CNY / HKD / USD)
+                    </h3>
+                    <button onclick="closeModal('fx-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleSaveFX(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="text-slate-400 block mb-1">人民幣兌港幣匯率 (1 CNY = ? HKD)</label>
+                        <input type="number" step="0.001" id="fx-cny-hkd" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">美元兌港幣聯繫匯率 (1 USD = ? HKD)</label>
+                        <input type="number" step="0.001" id="fx-usd-hkd" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm">
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm">
+                        更新全系統折算匯率
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="budget-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> 調整深港月度預算上限
+                    </h3>
+                    <button onclick="closeModal('budget-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleSaveBudget(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="text-slate-400 block mb-1">深圳每月生活預算上限 (CNY ¥)</label>
+                        <input type="number" step="100" id="input-sz-budget" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">香港每月通勤及日常預算上限 (HKD $)</label>
+                        <input type="number" step="100" id="input-hk-budget" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-sm">
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm">
+                        儲存雙城預算
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL 7: GITHUB PAGES 發佈與雲端共享中心 ================= -->
+        <div id="share-modal" class="fixed lg:absolute inset-0 bg-black/75 backdrop-blur-sm z-40 hidden flex items-end justify-center">
+            <div class="w-full bg-slate-900 border-t border-white/10 rounded-t-[32px] p-5 pb-8 space-y-4 max-h-[92vh] overflow-y-auto">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="github" class="w-5 h-5 text-emerald-400"></i> GitHub Pages 發佈與共享中心
+                    </h3>
+                    <button onclick="closeModal('share-modal')" class="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- GitHub Pages Quick Deployment Card -->
+                <div class="p-4 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/70 border border-indigo-500/30 space-y-3 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white flex items-center gap-1.5">
+                            <i data-lucide="rocket" class="w-4 h-4 text-indigo-400"></i> 透過您的 GitHub 免費永久發佈
+                        </span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono">GitHub Pages</span>
+                    </div>
+
+                    <!-- Step 1: Download Single-File HTML -->
+                    <div class="bg-slate-900/90 rounded-2xl p-3 border border-white/10 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-200 font-semibold">步驟 1：下載單一執行檔 `index.html`</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">已包含當前預設數據</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            點擊下方按鈕即可將整個 App（連同您目前的深港收支與期權數據作為預設值）打包下載為單一 `index.html` 檔案。
+                        </p>
+                        <button type="button" onclick="downloadStandaloneHTML()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-600/30 active:scale-98 transition">
+                            <i data-lucide="download" class="w-4 h-4"></i> 一鍵下載完整 `index.html` 部署包
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Configure GitHub Username & Repo to generate URL -->
+                    <div class="bg-slate-900/90 rounded-2xl p-3 border border-white/10 space-y-2.5">
+                        <span class="text-slate-200 font-semibold block">步驟 2：輸入您的 GitHub 帳號生成專屬公開網址</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">GitHub 用戶名 (Username)</label>
+                                <input type="text" id="gh-username" oninput="updateGitHubPagesUrl()" placeholder="例如: alex-hk" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono text-xs focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">倉庫名稱 (Repository)</label>
+                                <input type="text" id="gh-repo" oninput="updateGitHubPagesUrl()" value="sz-hk-wealth" placeholder="sz-hk-wealth" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white font-mono text-xs focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 pt-1">
+                            <label class="text-[10px] text-slate-400 block">您的 GitHub Pages 公開分享連結（所有人皆可訪問）：</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="share-url-input" readonly class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-emerald-400 font-mono text-[11px] focus:outline-none">
+                                <button type="button" onclick="copyShareLink()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1 shrink-0 active:scale-95 transition">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 複製
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick instructions & Git CLI helper -->
+                        <div class="pt-2 border-t border-white/5 space-y-2 text-[11px] text-slate-300">
+                            <p class="font-semibold text-indigo-300 flex items-center gap-1">
+                                <i data-lucide="terminal" class="w-3.5 h-3.5"></i> 30 秒上傳至 GitHub 指南：
+                            </p>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-400 text-[11px]">
+                                <li>登入 GitHub 建立一個 <strong class="text-white">Public（公開）</strong> 倉庫（例如命名為 <span class="font-mono text-indigo-300" id="guide-repo-name">sz-hk-wealth</span>）。</li>
+                                <li>點擊倉庫內的 <strong class="text-white">Add file → Upload files</strong>，將剛才下載的 <code class="text-emerald-300">index.html</code> 拖曳上傳並點擊 <strong class="text-white">Commit changes</strong>。</li>
+                                <li>進入倉庫頂部 <strong class="text-white">Settings → Pages</strong>，在 Branch 選擇 <code class="text-amber-300">main</code> 並按 <strong class="text-white">Save</strong>，約 30 秒後上方連結即全球生效！</li>
+                            </ol>
+                            <button type="button" onclick="copyGitCliCommands()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-[11px] flex items-center justify-center gap-1.5 border border-white/10 transition">
+                                <i data-lucide="code-2" class="w-3.5 h-3.5 text-cyan-400"></i> 複製 Git 終端機一鍵推送指令 (git push)
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="triggerNativeShare()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/25 active:scale-98 transition">
+                        <i data-lucide="send" class="w-4 h-4"></i> 一鍵將網址發送至 WhatsApp / 微信 / AirDrop
+                    </button>
+                </div>
+
+                <!-- JSON Backup & Sync for GitHub Pages Visitors -->
+                <div class="bg-slate-950 rounded-2xl p-3.5 border border-white/10 space-y-2.5 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+                            <i data-lucide="file-json" class="w-4 h-4 text-amber-400"></i> 跨設備數據快照匯出 / 匯入
+                        </span>
+                        <span class="text-[10px] text-slate-500">適合朋友間傳送賬本</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="exportLedgerJSON()" class="py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-medium flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="download-cloud" class="w-3.5 h-3.5 text-amber-400"></i> 匯出 JSON 備份
+                        </button>
+                        <label class="py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-medium flex items-center justify-center gap-1.5 cursor-pointer transition">
+                            <i data-lucide="upload-cloud" class="w-3.5 h-3.5 text-cyan-400"></i> 匯入 JSON 數據
+                            <input type="file" accept=".json" onchange="importLedgerJSON(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Workspace Mode Switcher (Public Shared vs Private Personal) -->
+                <div class="space-y-1.5 text-xs">
+                    <label class="text-slate-400 font-medium block">雲端實時同步模式 (支援多人共同編輯或個人獨立賬本)</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="switchCloudMode('PUBLIC')" id="mode-btn-PUBLIC" class="p-3 rounded-2xl border border-emerald-500 bg-emerald-500/15 text-left transition">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-white flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5 text-emerald-400"></i> 公開共享賬本</span>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            </div>
+                            <p class="text-[10px] text-slate-300 mt-1">所有持連結者共同查看及編輯同一份深港資產與期權倉位</p>
+                        </button>
+                        <button type="button" onclick="switchCloudMode('PRIVATE')" id="mode-btn-PRIVATE" class="p-3 rounded-2xl border border-slate-800 bg-slate-800/60 text-left transition">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-200 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5 text-indigo-400"></i> 個人獨立空間</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1">每位打開連結的朋友擁有各自獨立的私人賬本</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User ID & Cloud Reset Controls -->
+                <div class="bg-slate-800/60 rounded-2xl p-3 border border-white/5 space-y-2 text-[11px]">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">您的雲端識別碼 (User ID):</span>
+                        <button type="button" onclick="copyUserId()" class="text-indigo-400 hover:underline flex items-center gap-1 font-mono">
+                            <i data-lucide="copy" class="w-3 h-3"></i> 複製 ID
+                        </button>
+                    </div>
+                    <p id="cloud-user-id" class="font-mono text-[10px] text-slate-300 bg-slate-950 px-2.5 py-1.5 rounded-lg break-all select-all">正在連接雲端認證...</p>
+                    <div class="flex justify-between items-center pt-1 border-t border-white/5">
+                        <span class="text-slate-400">iPhone 15 Pro Max 安裝提示：</span>
+                        <button type="button" onclick="resetDemoData()" class="text-rose-400 hover:underline font-medium">重設為預設示範數據</button>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed">
+                        💡 發佈到 GitHub Pages 後，任何人用 iPhone Safari 打開您的 `<span class="font-mono text-emerald-300">github.io</span>` 網址並點選 <strong class="text-white">「分享」→「加入主畫面」</strong>，即可全螢幕安裝使用。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const defaultState = {
+            cloudMode: 'PUBLIC', // 'PUBLIC' (shared with everyone with the link) | 'PRIVATE' (personal workspace)
+            githubUser: '',
+            githubRepo: 'sz-hk-wealth',
+            baseCurrency: 'HKD', // 'HKD' | 'CNY' | 'USD'
+            privacyMode: false,
+            fx: {
+                CNY_TO_HKD: 1.086,
+                USD_TO_HKD: 7.785
+            },
+            budgets: {
+                szMonthlyCNY: 12000,
+                hkMonthlyHKD: 10000
+            },
+            txFilter: 'ALL',
+            optFilter: 'OPEN',
+            accounts: [
+                { id: 'hsbc-hk', name: 'HSBC 滙豐 One (香港出糧)', group: 'HK_BANK', currency: 'HKD', balance: 248500, icon: 'building-2', subtitle: '香港主戶口 · FPS轉數快' },
+                { id: 'bochk-hk', name: '中銀香港 (跨境發薪專戶)', group: 'HK_BANK', currency: 'HKD', balance: 96400, icon: 'landmark', subtitle: '同名跨境匯款免手續費' },
+                { id: 'mox-bank', name: 'Mox Bank 活期儲蓄', group: 'HK_BANK', currency: 'HKD', balance: 45200, icon: 'smartphone', subtitle: '香港日常及高息活期' },
+                { id: 'cmb-sz', name: '招商銀行 (深圳金葵花)', group: 'SZ_BANK', currency: 'CNY', balance: 118500, icon: 'shield-check', subtitle: '深圳房租代扣 · 朝朝寶' },
+                { id: 'wechat-sz', name: '微信零錢通 / 支付寶', group: 'SZ_BANK', currency: 'CNY', balance: 14680, icon: 'qr-code', subtitle: '深圳美團 / 滴滴 / 掃碼日常' },
+                { id: 'futu-hk', name: '富途證券 (港股及期權保證金)', group: 'BROKER', currency: 'HKD', balance: 325000, icon: 'candlestick-chart', subtitle: '港股收息及 Short Put 倉' },
+                { id: 'ibkr-pro', name: '盈透證券 IBKR (美股期權主倉)', group: 'BROKER', currency: 'USD', balance: 65800, icon: 'globe-2', subtitle: '美股 Wheel 期權收租' }
+            ],
+            creditCards: [
+                { id: 'hsbc-pulse', name: 'HSBC Pulse 銀聯雙幣鑽石卡', last4: '6821', region: 'HK', currency: 'HKD', balance: 9420, limit: 120000, dueDay: 22, perk: '深圳北上掃碼 4.4% 獎賞錢回贈', paidThisMonth: false, color: 'from-rose-900/80 to-slate-900' },
+                { id: 'mox-card', name: 'Mox Credit (香港交通餐飲)', last4: '3049', region: 'HK', currency: 'HKD', balance: 4850, limit: 80000, dueDay: 19, perk: '港鐵/八達通自動增值 2% 無上限', paidThisMonth: false, color: 'from-cyan-900/80 to-slate-900' },
+                { id: 'cmb-card', name: '招商銀行經典白金卡 (深圳)', last4: '9108', region: 'SZ', currency: 'CNY', balance: 6280, limit: 100000, dueDay: 25, perk: '深圳山姆/美團外賣/高鐵貴賓廳', paidThisMonth: false, color: 'from-amber-900/80 to-slate-900' },
+                { id: 'boc-cheers', name: '中銀 Cheers Card Visa Infinite', last4: '5512', region: 'HK', currency: 'HKD', balance: 4180, limit: 150000, dueDay: 28, perk: '香港餐飲及海外簽賬 4% 現金回贈', paidThisMonth: true, color: 'from-indigo-900/80 to-slate-900' }
+            ],
+            transactions: [
+                { id: 'tx-1', title: '深圳福田中心區高級公寓月租', category: 'home', type: 'EXPENSE', city: 'SZ', currency: 'CNY', amount: 6500, accountName: '招商銀行 (深圳金葵花)', date: '10月15日 09:00' },
+                { id: 'tx-2', title: '西九龍 ⇄ 福田高鐵月票及車票', category: 'train', type: 'EXPENSE', city: 'HK', currency: 'HKD', amount: 3480, accountName: 'HSBC Pulse 銀聯雙幣鑽石卡', date: '10月14日 19:20' },
+                { id: 'tx-3', title: '福田印力中心山姆會員店極速達', category: 'shopping-bag', type: 'EXPENSE', city: 'SZ', currency: 'CNY', amount: 865, accountName: '招商銀行經典白金卡 (深圳)', date: '10月14日 21:10' },
+                { id: 'tx-4', title: '中環 IFC 商務午餐及精品咖啡', category: 'utensils', type: 'EXPENSE', city: 'HK', currency: 'HKD', amount: 1680, accountName: 'Mox Credit (香港交通餐飲)', date: '10月13日 13:15' },
+                { id: 'tx-5', title: '深圳萬象天地晚餐及奈雪外賣', category: 'utensils', type: 'EXPENSE', city: 'SZ', currency: 'CNY', amount: 645, accountName: '微信零錢通 / 支付寶', date: '10月12日 20:30' },
+                { id: 'tx-6', title: '南山中醫推拿理療及周末SPA', category: 'heart-pulse', type: 'EXPENSE', city: 'SZ', currency: 'CNY', amount: 410, accountName: 'HSBC Pulse 銀聯雙幣鑽石卡', date: '10月11日 16:45' },
+                { id: 'tx-7', title: '香港金鐘辦公室地鐵八達通自動增值', category: 'train', type: 'EXPENSE', city: 'HK', currency: 'HKD', amount: 990, accountName: 'Mox Credit (香港交通餐飲)', date: '10月10日 08:40' },
+                { id: 'tx-8', title: '香港科技金融公司月薪 (扣除MPF)', category: 'briefcase', type: 'INCOME', city: 'HK', currency: 'HKD', amount: 68500, accountName: 'HSBC 滙豐 One (香港出糧)', date: '10月05日 09:30' }
+            ],
+            transfers: [
+                { id: 'tf-1', fromName: '中銀香港 (跨境發薪專戶)', toName: '招商銀行 (深圳金葵花)', fromCurr: 'HKD', toCurr: 'CNY', fromAmount: 15000, toAmount: 13812, note: '深港同名跨境匯款 · 補充深圳房租及生活費', date: '10月06日 14:20' },
+                { id: 'tf-2', fromName: 'HSBC 滙豐 One (香港出糧)', toName: '盈透證券 IBKR (美股期權主倉)', fromCurr: 'HKD', toCurr: 'USD', fromAmount: 38925, toAmount: 5000, note: 'eDDA 秒速入金增加美股 Short Put 保證金', date: '10月08日 10:15' }
+            ],
+            options: [
+                {
+                    id: 'opt-1',
+                    market: 'US',
+                    ticker: 'NVDA',
+                    name: 'NVIDIA Corp',
+                    strategy: 'SHORT_PUT',
+                    strike: 125,
+                    expiry: '2026-11-20',
+                    contracts: 2,
+                    multiplier: 100,
+                    currency: 'USD',
+                    openPremium: 3.85,
+                    currentPremium: 1.15,
+                    delta: -0.19,
+                    status: 'OPEN',
+                    brokerId: 'ibkr-pro'
+                },
+                {
+                    id: 'opt-2',
+                    market: 'HK',
+                    ticker: '00700.HK',
+                    name: '騰訊控股 Tencent',
+                    strategy: 'SHORT_PUT',
+                    strike: 400,
+                    expiry: '2026-10-29',
+                    contracts: 3,
+                    multiplier: 100,
+                    currency: 'HKD',
+                    openPremium: 8.60,
+                    currentPremium: 2.30,
+                    delta: -0.21,
+                    status: 'OPEN',
+                    brokerId: 'futu-hk'
+                },
+                {
+                    id: 'opt-3',
+                    market: 'US',
+                    ticker: 'TSLA',
+                    name: 'Tesla Inc (Covered Call)',
+                    strategy: 'SHORT_CALL',
+                    strike: 265,
+                    expiry: '2026-11-06',
+                    contracts: 1,
+                    multiplier: 100,
+                    currency: 'USD',
+                    openPremium: 5.40,
+                    currentPremium: 2.10,
+                    delta: 0.24,
+                    status: 'OPEN',
+                    brokerId: 'ibkr-pro'
+                },
+                {
+                    id: 'opt-4',
+                    market: 'HK',
+                    ticker: '03690.HK',
+                    name: '美團-W Meituan',
+                    strategy: 'SHORT_PUT',
+                    strike: 165,
+                    expiry: '2026-09-29',
+                    contracts: 5,
+                    multiplier: 100,
+                    currency: 'HKD',
+                    openPremium: 4.50,
+                    currentPremium: 0.00,
+                    delta: 0.00,
+                    status: 'CLOSED',
+                    brokerId: 'futu-hk'
+                },
+                {
+                    id: 'opt-5',
+                    market: 'US',
+                    ticker: 'AAPL',
+                    name: 'Apple Inc',
+                    strategy: 'SHORT_PUT',
+                    strike: 215,
+                    expiry: '2026-09-18',
+                    contracts: 2,
+                    multiplier: 100,
+                    currency: 'USD',
+                    openPremium: 3.10,
+                    currentPremium: 0.00,
+                    delta: -1.00,
+                    status: 'ASSIGNED',
+                    brokerId: 'ibkr-pro'
+                }
+            ]
+        };
+
+        let state = JSON.parse(JSON.stringify(defaultState));
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let unsubscribeSnapshot = null;
+        let isApplyingRemoteUpdate = false;
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sz-hk-wealth-pro';
+
+        async function initCloudSync() {
+            updateGitHubPagesUrl();
+
+            try {
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        currentUser = user;
+                        if (user) {
+                            const uidEl = document.getElementById('cloud-user-id');
+                            if (uidEl) uidEl.textContent = user.uid;
+                            subscribeToLedger();
+                        }
+                    });
+                } else {
+                    const uidEl = document.getElementById('cloud-user-id');
+                    if (uidEl) uidEl.textContent = 'LOCAL-PREVIEW-MODE';
+                }
+            } catch (err) {
+                console.warn('Cloud initialization fallback:', err);
+            }
+        }
+
+        function getLedgerDocRef() {
+            if (!db || !currentUser) return null;
+            if (state.cloudMode === 'PRIVATE') {
+                return doc(db, 'artifacts', appId, 'users', currentUser.uid, 'wealth_state', 'main_ledger');
+            }
+            return doc(db, 'artifacts', appId, 'public', 'data', 'wealth_state', 'shared_ledger');
+        }
+
+        function subscribeToLedger() {
+            if (!db || !currentUser) return;
+            if (unsubscribeSnapshot) {
+                unsubscribeSnapshot();
+            }
+
+            const docRef = getLedgerDocRef();
+            if (!docRef) return;
+
+            unsubscribeSnapshot = onSnapshot(
+                docRef,
+                async (snapshot) => {
+                    if (snapshot.exists()) {
+                        const cloudData = snapshot.data();
+                        isApplyingRemoteUpdate = true;
+                        const currentMode = state.cloudMode;
+                        const currentPrivacy = state.privacyMode;
+                        state = Object.assign({}, JSON.parse(JSON.stringify(defaultState)), cloudData, {
+                            cloudMode: currentMode,
+                            privacyMode: currentPrivacy
+                        });
+                        renderAll();
+                        isApplyingRemoteUpdate = false;
+                    } else {
+                        await saveStateToCloud();
+                    }
+                },
+                (err) => {
+                    console.warn('Realtime sync listener error:', err);
+                }
+            );
+        }
+
+        async function saveStateToCloud() {
+            if (!db || !currentUser || isApplyingRemoteUpdate) return;
+            try {
+                const docRef = getLedgerDocRef();
+                if (!docRef) return;
+                const payload = JSON.parse(JSON.stringify(state));
+                payload.updatedAt = new Date().toISOString();
+                payload.updatedBy = currentUser.uid;
+                await setDoc(docRef, payload);
+            } catch (e) {
+                console.warn('Unable to sync state to cloud:', e);
+            }
+        }
+
+        function saveState() {
+            saveStateToCloud();
+        }
+
+        function switchCloudMode(mode) {
+            state.cloudMode = mode;
+            const pubBtn = document.getElementById('mode-btn-PUBLIC');
+            const privBtn = document.getElementById('mode-btn-PRIVATE');
+            const syncBadge = document.getElementById('sync-badge-text');
+
+            if (mode === 'PUBLIC') {
+                pubBtn.className = 'p-3 rounded-2xl border border-emerald-500 bg-emerald-500/15 text-left transition';
+                privBtn.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-800/60 text-left transition';
+                if (syncBadge) syncBadge.textContent = 'PUBLIC LIVE';
+                showToast('已切換至「公開共享賬本」，所有持連結者實時同步');
+            } else {
+                privBtn.className = 'p-3 rounded-2xl border border-indigo-500 bg-indigo-500/15 text-left transition';
+                pubBtn.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-800/60 text-left transition';
+                if (syncBadge) syncBadge.textContent = 'PRIVATE';
+                showToast('已切換至「個人獨立空間」，僅您本人可見');
+            }
+
+            subscribeToLedger();
+        }
+
+        function copyTextFallback(text, successMsg) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(successMsg);
+        }
+
+        function updateGitHubPagesUrl() {
+            const userInput = document.getElementById('gh-username');
+            const repoInput = document.getElementById('gh-repo');
+            const shareInput = document.getElementById('share-url-input');
+            const guideRepo = document.getElementById('guide-repo-name');
+
+            const username = (userInput && userInput.value.trim()) ? userInput.value.trim() : (state.githubUser || '');
+            const repo = (repoInput && repoInput.value.trim()) ? repoInput.value.trim() : (state.githubRepo || 'sz-hk-wealth');
+
+            state.githubUser = username;
+            state.githubRepo = repo;
+            if (guideRepo) guideRepo.textContent = repo;
+
+            if (shareInput) {
+                if (username) {
+                    shareInput.value = `https://${username}.github.io/${repo}/`;
+                } else {
+                    shareInput.value = window.location.href;
+                }
+            }
+        }
+
+        function downloadStandaloneHTML() {
+            try {
+                // Embed the user's current state directly as the initial defaultState in the downloaded HTML file
+                let rawHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                const currentStateJson = JSON.stringify(state, null, 12);
+                rawHtml = rawHtml.replace(
+                    /const defaultState = \{[\s\S]*?\n        \};/,
+                    `const defaultState = ${currentStateJson};`
+                );
+
+                const blob = new Blob([rawHtml], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'index.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('已成功下載單一執行檔 index.html！可直接上傳至您的 GitHub 倉庫');
+            } catch (err) {
+                console.error(err);
+                showToast('下載 HTML 失敗，請重試');
+            }
+        }
+
+        function copyGitCliCommands() {
+            const username = (document.getElementById('gh-username')?.value.trim()) || '您的GitHub帳號';
+            const repo = (document.getElementById('gh-repo')?.value.trim()) || 'sz-hk-wealth';
+            const cmds = [
+                `git init`,
+                `git add index.html`,
+                `git commit -m "Deploy SZ-HK Wealth & Options Pro"`,
+                `git branch -M main`,
+                `git remote add origin https://github.com/${username}/${repo}.git`,
+                `git push -u origin main`
+            ].join('\n');
+            copyTextFallback(cmds, '已複製 Git 終端機部署指令！');
+        }
+
+        function exportLedgerJSON() {
+            const dataStr = JSON.stringify(state, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sz-hk-wealth-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('已匯出深港雙城資產與期權 JSON 備份檔');
+        }
+
+        function importLedgerJSON(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && imported.accounts && imported.transactions) {
+                        state = Object.assign({}, defaultState, imported);
+                        saveState();
+                        renderAll();
+                        showToast('成功匯入 JSON 賬本數據並已同步！');
+                    } else {
+                        showToast('JSON 檔案格式不正確');
+                    }
+                } catch (err) {
+                    showToast('無法解析 JSON 檔案');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function copyShareLink() {
+            const shareInput = document.getElementById('share-url-input');
+            const url = (shareInput && shareInput.value) ? shareInput.value : window.location.href;
+            copyTextFallback(url, `已複製公開連結：${url}`);
+        }
+
+        function copyUserId() {
+            const uid = currentUser ? currentUser.uid : 'LOCAL-USER';
+            copyTextFallback(uid, '已複製您的雲端識別碼 (User ID)');
+        }
+
+        async function triggerNativeShare() {
+            const shareInput = document.getElementById('share-url-input');
+            const targetUrl = (shareInput && shareInput.value) ? shareInput.value : window.location.href;
+            const shareData = {
+                title: '雙城財富 Pro | 深圳生活·香港工作資產與期權管家',
+                text: '邀請你使用「深港雙城資產與期權管家」，支援深港雙幣預算、信用卡還款及港美股 Short Option 紀錄！',
+                url: targetUrl
+            };
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    copyShareLink();
+                }
+            } else {
+                copyShareLink();
+            }
+        }
+
+        function resetDemoData() {
+            const keepMode = state.cloudMode;
+            state = JSON.parse(JSON.stringify(defaultState));
+            state.cloudMode = keepMode;
+            saveState();
+            renderAll();
+            closeModal('share-modal');
+            showToast('已重設為預設深港雙城示範數據並同步至雲端');
+        }
+
+        function toHKD(amount, currency) {
+            if (currency === 'HKD') return amount;
+            if (currency === 'CNY') return amount * state.fx.CNY_TO_HKD;
+            if (currency === 'USD') return amount * state.fx.USD_TO_HKD;
+            return amount;
+        }
+
+        function fromHKD(hkdAmount, targetCurrency) {
+            if (targetCurrency === 'HKD') return hkdAmount;
+            if (targetCurrency === 'CNY') return hkdAmount / state.fx.CNY_TO_HKD;
+            if (targetCurrency === 'USD') return hkdAmount / state.fx.USD_TO_HKD;
+            return hkdAmount;
+        }
+
+        function convertCurrency(amount, fromCurr, toCurr) {
+            const hkd = toHKD(amount, fromCurr);
+            return fromHKD(hkd, toCurr);
+        }
+
+        function getCurrencySymbol(curr) {
+            if (curr === 'CNY') return '¥';
+            if (curr === 'USD') return 'US$';
+            return 'HK$';
+        }
+
+        function formatMoney(amount, currency, showDecimals = false) {
+            if (state.privacyMode) return `${getCurrencySymbol(currency)} ****`;
+            const rounded = showDecimals ? Number(amount).toFixed(2) : Math.round(amount).toLocaleString('en-US');
+            if (showDecimals) {
+                const parts = rounded.split('.');
+                parts[0] = Number(parts[0]).toLocaleString('en-US');
+                return `${getCurrencySymbol(currency)} ${parts.join('.')}`;
+            }
+            return `${getCurrencySymbol(currency)} ${rounded}`;
+        }
+
+        function showToast(msg) {
+            const banner = document.getElementById('toast-banner');
+            const text = document.getElementById('toast-message');
+            text.textContent = msg;
+            banner.classList.remove('opacity-0', '-translate-y-3', 'pointer-events-none');
+            banner.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                banner.classList.remove('opacity-100', 'translate-y-0');
+                banner.classList.add('opacity-0', '-translate-y-3', 'pointer-events-none');
+            }, 2600);
+        }
+
+        function renderHeroAndGlobalStats() {
+            // Update Dynamic Island FX Pill
+            document.getElementById('island-fx-display').textContent = `¥1=HK$${state.fx.CNY_TO_HKD.toFixed(3)} · $1=HK$${state.fx.USD_TO_HKD.toFixed(2)}`;
+            document.getElementById('base-curr-label').textContent = `計價: ${state.baseCurrency}`;
+            document.getElementById('hero-curr-code').textContent = state.baseCurrency;
+
+            // Total Assets in HKD
+            let totalAssetsHKD = 0;
+            state.accounts.forEach(acc => {
+                totalAssetsHKD += toHKD(acc.balance, acc.currency);
+            });
+
+            // Total Unpaid Credit Cards in HKD
+            let totalCardDebtHKD = 0;
+            state.creditCards.forEach(card => {
+                if (!card.paidThisMonth) {
+                    totalCardDebtHKD += toHKD(card.balance, card.currency);
+                }
+            });
+
+            const netWorthBase = fromHKD(totalAssetsHKD - totalCardDebtHKD, state.baseCurrency);
+            document.getElementById('hero-net-worth').textContent = formatMoney(netWorthBase, state.baseCurrency);
+
+            // Calculate SZ & HK Monthly Spend
+            let szSpendCNY = 0;
+            let hkSpendHKD = 0;
+            let hkIncomeHKD = 0;
+
+            state.transactions.forEach(tx => {
+                if (tx.type === 'EXPENSE') {
+                    if (tx.city === 'SZ') {
+                        szSpendCNY += convertCurrency(tx.amount, tx.currency, 'CNY');
+                    } else {
+                        hkSpendHKD += convertCurrency(tx.amount, tx.currency, 'HKD');
+                    }
+                } else if (tx.type === 'INCOME') {
+                    hkIncomeHKD += convertCurrency(tx.amount, tx.currency, 'HKD');
+                }
+            });
+
+            document.getElementById('hero-sz-spend').textContent = formatMoney(szSpendCNY, 'CNY');
+            document.getElementById('hero-hk-spend').textContent = formatMoney(hkSpendHKD, 'HKD');
+
+            // Option Total Open + Closed Credit in HKD
+            let totalOptionPremHKD = 0;
+            state.options.forEach(opt => {
+                const realizedPerShare = opt.status === 'OPEN'
+                    ? (opt.openPremium - opt.currentPremium)
+                    : (opt.openPremium - opt.currentPremium);
+                const totalContractProfit = realizedPerShare * opt.contracts * opt.multiplier;
+                totalOptionPremHKD += toHKD(totalContractProfit, opt.currency);
+            });
+
+            document.getElementById('hero-opt-prem').textContent = `+${formatMoney(totalOptionPremHKD, 'HKD')}`;
+
+            // Savings Rate
+            const totalSpendHKD = toHKD(szSpendCNY, 'CNY') + hkSpendHKD;
+            const savingsRate = hkIncomeHKD > 0 ? Math.max(0, ((hkIncomeHKD - totalSpendHKD) / hkIncomeHKD) * 100) : 0;
+            document.getElementById('hero-savings-rate').textContent = `+${savingsRate.toFixed(1)}%`;
+
+            // Update Dual-City Budget Bars
+            const szPct = Math.min(100, Math.round((szSpendCNY / state.budgets.szMonthlyCNY) * 100));
+            document.getElementById('sz-budget-pct').textContent = `${szPct}%`;
+            document.getElementById('sz-budget-bar').style.width = `${szPct}%`;
+            document.getElementById('sz-budget-spent').textContent = `已用: ${formatMoney(szSpendCNY, 'CNY')}`;
+            document.getElementById('sz-budget-limit').textContent = `預算: ${formatMoney(state.budgets.szMonthlyCNY, 'CNY')}`;
+
+            const hkPct = Math.min(100, Math.round((hkSpendHKD / state.budgets.hkMonthlyHKD) * 100));
+            document.getElementById('hk-budget-pct').textContent = `${hkPct}%`;
+            document.getElementById('hk-budget-bar').style.width = `${hkPct}%`;
+            document.getElementById('hk-budget-spent').textContent = `已用: ${formatMoney(hkSpendHKD, 'HKD')}`;
+            document.getElementById('hk-budget-limit').textContent = `預算: ${formatMoney(state.budgets.hkMonthlyHKD, 'HKD')}`;
+        }
+
+        function renderLivingTab() {
+            const container = document.getElementById('living-tx-list');
+            const filtered = state.transactions.filter(tx => {
+                if (state.txFilter === 'ALL') return true;
+                return tx.city === state.txFilter;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-panel rounded-2xl p-6 text-center text-slate-400 text-xs">
+                        暫無符合篩選條件的收支記錄
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(tx => {
+                const isExpense = tx.type === 'EXPENSE';
+                const cityBadge = tx.city === 'SZ'
+                    ? `<span class="px-1.5 py-0.5 text-[10px] rounded-md bg-rose-500/20 text-rose-300 font-medium">深圳 SZ</span>`
+                    : `<span class="px-1.5 py-0.5 text-[10px] rounded-md bg-indigo-500/20 text-indigo-300 font-medium">香港 HK</span>`;
+
+                const eqHKD = tx.currency !== 'HKD'
+                    ? `<span class="text-[10px] text-slate-500 font-mono block">≈ HK$ ${Math.round(toHKD(tx.amount, tx.currency)).toLocaleString()}</span>`
+                    : `<span class="text-[10px] text-slate-500 font-mono block">≈ ¥ ${Math.round(convertCurrency(tx.amount, 'HKD', 'CNY')).toLocaleString()}</span>`;
+
+                return `
+                    <div class="glass-panel rounded-2xl p-3.5 flex justify-between items-center hover:border-white/15 transition">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-2xl ${isExpense ? 'bg-slate-800 text-slate-200' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center shrink-0 border border-white/5">
+                                <i data-lucide="${tx.category || 'receipt'}" class="w-5 h-5"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5">
+                                    ${cityBadge}
+                                    <p class="text-xs font-semibold text-slate-100 truncate">${tx.title}</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
+                                    <span class="truncate">${tx.accountName}</span>
+                                    <span>·</span>
+                                    <span class="shrink-0">${tx.date}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0 ml-2">
+                            <span class="text-sm font-mono font-bold ${isExpense ? 'text-slate-100' : 'text-emerald-400'}">
+                                ${isExpense ? '-' : '+'}${formatMoney(tx.amount, tx.currency)}
+                            </span>
+                            ${eqHKD}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderCreditCardsTab() {
+            let hkdUnpaid = 0;
+            let cnyUnpaid = 0;
+            let unpaidCount = 0;
+
+            state.creditCards.forEach(c => {
+                if (!c.paidThisMonth && c.balance > 0) {
+                    unpaidCount++;
+                    if (c.currency === 'HKD') hkdUnpaid += c.balance;
+                    if (c.currency === 'CNY') cnyUnpaid += c.balance;
+                }
+            });
+
+            document.getElementById('cards-hkd-unpaid').textContent = formatMoney(hkdUnpaid, 'HKD');
+            document.getElementById('cards-cny-unpaid').textContent = formatMoney(cnyUnpaid, 'CNY');
+
+            const badge = document.getElementById('nav-card-badge');
+            badge.textContent = unpaidCount;
+            badge.style.display = unpaidCount > 0 ? 'flex' : 'none';
+
+            const currentDay = 15; // Oct 15 reference
+            const listEl = document.getElementById('credit-cards-list');
+
+            listEl.innerHTML = state.creditCards.map(card => {
+                const utilPct = Math.min(100, Math.round((card.balance / card.limit) * 100));
+                let daysLeft = card.dueDay - currentDay;
+                if (daysLeft < 0) daysLeft += 30;
+
+                const statusBadge = card.paidThisMonth || card.balance <= 0
+                    ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> 本期已繳清</span>`
+                    : `<span class="px-2.5 py-1 rounded-full ${daysLeft <= 5 ? 'bg-rose-500/25 text-rose-300 border-rose-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'} border text-[11px] font-semibold flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 尚餘 ${daysLeft} 天到期 (每月${card.dueDay}號)</span>`;
+
+                return `
+                    <div class="rounded-3xl bg-gradient-to-br ${card.color} border border-white/10 p-4 shadow-xl space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded bg-white/10 text-white">${card.region === 'HK' ? '🇭🇰 香港卡' : '🇨🇳 深圳卡'} · ${card.currency}</span>
+                                    <span class="text-xs font-mono text-slate-300">•••• ${card.last4}</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-white mt-1">${card.name}</h3>
+                                <p class="text-[11px] text-slate-300/90 mt-0.5 flex items-center gap-1">
+                                    <i data-lucide="sparkles" class="w-3 h-3 text-amber-300"></i> ${card.perk}
+                                </p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
+                            <div>
+                                <span class="text-[11px] text-slate-300 block">本期應還結欠</span>
+                                <span class="text-lg font-mono font-bold text-white">${formatMoney(card.balance, card.currency)}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-300 block">信用額度使用率 (${utilPct}%)</span>
+                                <span class="text-xs font-mono text-slate-300">額度: ${formatMoney(card.limit, card.currency)}</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                            <div class="h-full ${card.paidThisMonth ? 'bg-emerald-400' : 'bg-amber-400'} rounded-full" style="width: ${utilPct}%"></div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-1">
+                            <span class="text-[11px] text-slate-300 font-mono">
+                                ${card.currency === 'CNY' ? `折合港幣 ≈ HK$ ${Math.round(toHKD(card.balance, 'CNY')).toLocaleString()}` : `折合人民幣 ≈ ¥ ${Math.round(convertCurrency(card.balance, 'HKD', 'CNY')).toLocaleString()}`}
+                            </span>
+                            ${!card.paidThisMonth && card.balance > 0 ? `
+                                <button onclick="openPayCardModal('${card.id}')" class="px-3.5 py-1.5 rounded-xl bg-white text-slate-950 font-bold text-xs hover:bg-slate-200 active:scale-95 transition flex items-center gap-1 shadow">
+                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i> 立即還款
+                                </button>
+                            ` : `
+                                <button onclick="resetCardBill('${card.id}')" class="text-[11px] text-slate-300 underline hover:text-white">
+                                    重設下期新賬單
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderAssetsTab() {
+            let hkSumHKD = 0;
+            let szSumHKD = 0;
+            let brokerSumHKD = 0;
+
+            state.accounts.forEach(acc => {
+                const valHKD = toHKD(acc.balance, acc.currency);
+                if (acc.group === 'HK_BANK') hkSumHKD += valHKD;
+                if (acc.group === 'SZ_BANK') szSumHKD += valHKD;
+                if (acc.group === 'BROKER') brokerSumHKD += valHKD;
+            });
+
+            const totalHKD = Math.max(1, hkSumHKD + szSumHKD + brokerSumHKD);
+            const hkPct = Math.round((hkSumHKD / totalHKD) * 100);
+            const szPct = Math.round((szSumHKD / totalHKD) * 100);
+            const brokerPct = Math.max(0, 100 - hkPct - szPct);
+
+            document.getElementById('asset-dist-hk').textContent = `香港銀行 (${hkPct}%)`;
+            document.getElementById('asset-dist-sz').textContent = `深圳戶口 (${szPct}%)`;
+            document.getElementById('asset-dist-broker').textContent = `港美券商 (${brokerPct}%)`;
+
+            document.getElementById('bar-dist-hk').style.width = `${hkPct}%`;
+            document.getElementById('bar-dist-sz').style.width = `${szPct}%`;
+            document.getElementById('bar-dist-broker').style.width = `${brokerPct}%`;
+
+            const groups = [
+                { key: 'HK_BANK', title: '🇭🇰 香港銀行戶口 (出糧 / FPS / 同名匯款)', badgeColor: 'text-indigo-400' },
+                { key: 'SZ_BANK', title: '🇨🇳 深圳銀行及電子錢包 (房租 / 掃碼日常)', badgeColor: 'text-rose-400' },
+                { key: 'BROKER', title: '📈 港美股期權券商保證金戶口', badgeColor: 'text-emerald-400' }
+            ];
+
+            const groupContainer = document.getElementById('accounts-group-container');
+            groupContainer.innerHTML = groups.map(g => {
+                const items = state.accounts.filter(a => a.group === g.key);
+                return `
+                    <div class="glass-panel rounded-3xl p-4 space-y-2.5">
+                        <h3 class="text-xs font-bold ${g.badgeColor} flex items-center justify-between">
+                            <span>${g.title}</span>
+                        </h3>
+                        <div class="space-y-2">
+                            ${items.map(acc => `
+                                <div class="bg-slate-900/90 rounded-2xl p-3 border border-white/5 flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-center text-slate-200">
+                                            <i data-lucide="${acc.icon}" class="w-4 h-4"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">${acc.name}</p>
+                                            <p class="text-[11px] text-slate-400">${acc.subtitle}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-mono font-bold text-white">${formatMoney(acc.balance, acc.currency)}</p>
+                                        ${acc.currency !== state.baseCurrency ? `<p class="text-[10px] font-mono text-slate-400">≈ ${formatMoney(convertCurrency(acc.balance, acc.currency, state.baseCurrency), state.baseCurrency)}</p>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Transfer History
+            const tfList = document.getElementById('transfer-history-list');
+            tfList.innerHTML = state.transfers.map(tf => `
+                <div class="bg-slate-900/90 rounded-2xl p-3 border border-white/5 space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                            <span>${tf.fromName}</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-cyan-400"></i>
+                            <span>${tf.toName}</span>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px]">
+                        <span class="text-slate-400">${tf.note} · ${tf.date}</span>
+                        <span class="font-mono font-bold text-cyan-300">
+                            -${formatMoney(tf.fromAmount, tf.fromCurr)} → +${formatMoney(tf.toAmount, tf.toCurr)}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderOptionsTab() {
+            let realizedHKD = 0;
+            let unrealizedHKD = 0;
+            let openPutCollateralHKD = 0;
+            let closedCount = 0;
+            let winCount = 0;
+            let assignedCount = 0;
+
+            state.options.forEach(opt => {
+                const pnlPerShare = opt.openPremium - opt.currentPremium;
+                const totalContractPnL = pnlPerShare * opt.contracts * opt.multiplier;
+                const pnlHKD = toHKD(totalContractPnL, opt.currency);
+
+                if (opt.status === 'OPEN') {
+                    unrealizedHKD += pnlHKD;
+                    // Also count initial credit collected
+                    realizedHKD += toHKD(opt.openPremium * opt.contracts * opt.multiplier, opt.currency);
+                    if (opt.strategy === 'SHORT_PUT') {
+                        const collateral = opt.strike * opt.contracts * opt.multiplier;
+                        openPutCollateralHKD += toHKD(collateral, opt.currency);
+                    }
+                } else {
+                    closedCount++;
+                    if (totalContractPnL >= 0) winCount++;
+                    if (opt.status === 'ASSIGNED') assignedCount++;
+                    realizedHKD += pnlHKD;
+                }
+            });
+
+            // Broker Cash Total in HKD
+            let brokerCashHKD = 0;
+            state.accounts.filter(a => a.group === 'BROKER').forEach(b => {
+                brokerCashHKD += toHKD(b.balance, b.currency);
+            });
+
+            const marginPct = brokerCashHKD > 0 ? Math.min(100, (openPutCollateralHKD / (brokerCashHKD + 150000)) * 100) : 0;
+
+            document.getElementById('opt-realized-total').textContent = `+${formatMoney(realizedHKD, 'HKD')}`;
+            document.getElementById('opt-unrealized-total').textContent = `+${formatMoney(unrealizedHKD, 'HKD')}`;
+            document.getElementById('opt-winrate-stat').innerHTML = `92% <span class="text-[10px] text-amber-400 font-normal">(${assignedCount}接貨)</span>`;
+
+            document.getElementById('opt-margin-pct').textContent = `${marginPct.toFixed(1)}% ${marginPct < 65 ? '安全' : '偏高'}`;
+            document.getElementById('opt-margin-bar').style.width = `${marginPct.toFixed(1)}%`;
+            document.getElementById('opt-collateral-used').textContent = `接貨最大敞口: ${formatMoney(openPutCollateralHKD, 'HKD')}`;
+            document.getElementById('opt-broker-cash').textContent = `券商總資產: ${formatMoney(brokerCashHKD, 'HKD')}`;
+
+            const filteredOpts = state.options.filter(o => {
+                if (state.optFilter === 'ALL') return true;
+                if (state.optFilter === 'OPEN') return o.status === 'OPEN';
+                return o.status !== 'OPEN';
+            });
+
+            const listEl = document.getElementById('options-positions-list');
+            listEl.innerHTML = filteredOpts.map(opt => {
+                const openCredit = opt.openPremium * opt.contracts * opt.multiplier;
+                const currentCost = opt.currentPremium * opt.contracts * opt.multiplier;
+                const netPnL = openCredit - currentCost;
+                const capturePct = openCredit > 0 ? Math.round(((opt.openPremium - opt.currentPremium) / opt.openPremium) * 100) : 100;
+                const collateral = opt.strike * opt.contracts * opt.multiplier;
+                const breakeven = opt.strategy === 'SHORT_PUT'
+                    ? (opt.strike - opt.openPremium).toFixed(2)
+                    : (opt.strike + opt.openPremium).toFixed(2);
+
+                // Calculate DTE (Days to Expiry from Oct 15, 2026)
+                const refDate = new Date('2026-10-15T00:00:00');
+                const expDate = new Date(opt.expiry + 'T00:00:00');
+                const dte = Math.max(0, Math.round((expDate - refDate) / (1000 * 60 * 60 * 24)));
+
+                const stratBadge = opt.strategy === 'SHORT_PUT'
+                    ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold">SHORT PUT</span>`
+                    : `<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold">SHORT CALL</span>`;
+
+                const statusBadge = opt.status === 'OPEN'
+                    ? `<span class="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-mono">DTE ${dte}天</span>`
+                    : opt.status === 'ASSIGNED'
+                    ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/25 text-amber-300 text-[10px] font-semibold">已接貨轉正股</span>`
+                    : `<span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-semibold">已止盈平倉</span>`;
+
+                return `
+                    <div class="glass-panel rounded-3xl p-4 space-y-3 border border-white/10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs">${opt.market === 'US' ? '🇺🇸' : '🇭🇰'}</span>
+                                    <span class="text-sm font-bold font-mono text-white">${opt.ticker}</span>
+                                    <span class="text-sm font-mono font-bold text-indigo-300">$${opt.strike}</span>
+                                    ${stratBadge}
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-0.5 font-mono">
+                                    到期: ${opt.expiry} · ${opt.contracts}張 (×${opt.multiplier}股) · Delta ${opt.delta}
+                                </p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+
+                        <!-- Option Metrics Grid -->
+                        <div class="grid grid-cols-3 gap-2 bg-slate-900/90 rounded-2xl p-2.5 border border-white/5 text-xs">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block">開倉實收權利金</span>
+                                <span class="font-mono font-bold text-slate-200">${formatMoney(openCredit, opt.currency, true)}</span>
+                                <span class="text-[10px] text-slate-500 font-mono block">@ ${opt.openPremium.toFixed(2)}/股</span>
+                            </div>
+                            <div class="border-l border-white/10 pl-2">
+                                <span class="text-[10px] text-slate-400 block">當前浮盈 (${capturePct}%)</span>
+                                <span class="font-mono font-bold text-emerald-400">+${formatMoney(netPnL, opt.currency, true)}</span>
+                                <span class="text-[10px] text-slate-500 font-mono block">現價 @ ${opt.currentPremium.toFixed(2)}</span>
+                            </div>
+                            <div class="border-l border-white/10 pl-2">
+                                <span class="text-[10px] text-slate-400 block">打和價 / 接貨資金</span>
+                                <span class="font-mono font-bold text-amber-300">BE: $${breakeven}</span>
+                                <span class="text-[10px] text-slate-500 font-mono block">${formatMoney(collateral, opt.currency)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Theta Decay Capture Progress Bar -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                                <span>時間價值收割進度 (Theta Decay)</span>
+                                <span class="text-emerald-400 font-bold">${capturePct}% 已收割</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full" style="width: ${Math.max(5, Math.min(100, capturePct))}%"></div>
+                            </div>
+                        </div>
+
+                        ${opt.status === 'OPEN' ? `
+                            <div class="flex gap-2 pt-1">
+                                <button onclick="closeOptionPosition('${opt.id}', 'TAKE_PROFIT')" class="flex-1 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 transition">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 提早止盈平倉
+                                </button>
+                                <button onclick="closeOptionPosition('${opt.id}', 'ASSIGNED')" class="flex-1 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 transition">
+                                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> 到期接貨轉正股
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['living', 'cards', 'assets', 'options'];
+            tabs.forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    section.classList.remove('hidden');
+                    navBtn.classList.remove('text-slate-400');
+                    navBtn.classList.add('text-indigo-400');
+                } else {
+                    section.classList.add('hidden');
+                    navBtn.classList.remove('text-indigo-400');
+                    navBtn.classList.add('text-slate-400');
+                }
+            });
+            document.getElementById('main-scroll').scrollTop = 0;
+        }
+
+        function cycleBaseCurrency() {
+            const order = ['HKD', 'CNY', 'USD'];
+            const nextIdx = (order.indexOf(state.baseCurrency) + 1) % order.length;
+            state.baseCurrency = order[nextIdx];
+            saveState();
+            renderAll();
+            showToast(`全局資產計價已切換為 ${state.baseCurrency}`);
+        }
+
+        function togglePrivacy() {
+            state.privacyMode = !state.privacyMode;
+            const icon = document.getElementById('privacy-icon');
+            icon.setAttribute('data-lucide', state.privacyMode ? 'eye-off' : 'eye');
+            renderAll();
+        }
+
+        function setTxFilter(filter) {
+            state.txFilter = filter;
+            ['ALL', 'SZ', 'HK'].forEach(f => {
+                const btn = document.getElementById(`tx-filter-${f}`);
+                if (f === filter) {
+                    btn.className = 'px-3 py-1 rounded-xl bg-indigo-600 text-white font-medium transition';
+                } else {
+                    btn.className = 'px-3 py-1 rounded-xl text-slate-400 hover:text-white transition';
+                }
+            });
+            renderLivingTab();
+        }
+
+        function setOptFilter(filter) {
+            state.optFilter = filter;
+            ['OPEN', 'CLOSED', 'ALL'].forEach(f => {
+                const btn = document.getElementById(`opt-filter-${f}`);
+                if (f === filter) {
+                    btn.className = 'px-3 py-1 rounded-xl bg-emerald-600 text-white font-medium transition';
+                } else {
+                    btn.className = 'px-3 py-1 rounded-xl text-slate-400 hover:text-white transition';
+                }
+            });
+            renderOptionsTab();
+        }
+
+        function quickRecordExpense(title, amount, currency, city, category, targetId) {
+            let accountName = '微信零錢通 / 支付寶';
+            const card = state.creditCards.find(c => c.id === targetId);
+            const acc = state.accounts.find(a => a.id === targetId);
+
+            if (card) {
+                accountName = card.name;
+                card.balance += convertCurrency(amount, currency, card.currency);
+                card.paidThisMonth = false;
+            } else if (acc) {
+                accountName = acc.name;
+                acc.balance = Math.max(0, acc.balance - convertCurrency(amount, currency, acc.currency));
+            }
+
+            state.transactions.unshift({
+                id: 'tx-' + Date.now(),
+                title,
+                category,
+                type: 'EXPENSE',
+                city,
+                currency,
+                amount,
+                accountName,
+                date: '剛剛'
+            });
+
+            saveState();
+            renderAll();
+            showToast(`已快速入賬：${title} (-${getCurrencySymbol(currency)}${amount})`);
+        }
+
+        function openModal(modalId) {
+            if (modalId === 'tx-modal') {
+                populateTxAccountsDropdown();
+            } else if (modalId === 'transfer-modal') {
+                populateTransferDropdowns();
+                updateTransferPreview();
+            } else if (modalId === 'fx-modal') {
+                document.getElementById('fx-cny-hkd').value = state.fx.CNY_TO_HKD;
+                document.getElementById('fx-usd-hkd').value = state.fx.USD_TO_HKD;
+            } else if (modalId === 'budget-modal') {
+                document.getElementById('input-sz-budget').value = state.budgets.szMonthlyCNY;
+                document.getElementById('input-hk-budget').value = state.budgets.hkMonthlyHKD;
+            } else if (modalId === 'option-modal') {
+                const nextMonth = new Date(2026, 10, 20).toISOString().split('T')[0];
+                document.getElementById('opt-expiry').value = nextMonth;
+                calcOptPreview();
+            }
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function populateTxAccountsDropdown() {
+            const select = document.getElementById('tx-account');
+            const accOpts = state.accounts.map(a => `<option value="ACC:${a.id}">🏦 ${a.name} (${a.currency})</option>`).join('');
+            const cardOpts = state.creditCards.map(c => `<option value="CARD:${c.id}">💳 ${c.name} (${c.currency})</option>`).join('');
+            select.innerHTML = `<optgroup label="銀行及電子錢包">${accOpts}</optgroup><optgroup label="深港信用卡">${cardOpts}</optgroup>`;
+        }
+
+        function handleSaveTx(e) {
+            e.preventDefault();
+            const type = document.getElementById('tx-type').value;
+            const cityCurr = document.getElementById('tx-city-curr').value;
+            const [city, currency] = cityCurr.split('_');
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const category = document.getElementById('tx-category').value;
+            const title = document.getElementById('tx-title').value.trim();
+            const accVal = document.getElementById('tx-account').value;
+
+            if (!amount || amount <= 0) return;
+
+            let accountName = '';
+            const [targetType, targetId] = accVal.split(':');
+
+            if (targetType === 'ACC') {
+                const acc = state.accounts.find(a => a.id === targetId);
+                if (acc) {
+                    accountName = acc.name;
+                    const delta = convertCurrency(amount, currency, acc.currency);
+                    acc.balance = type === 'EXPENSE' ? acc.balance - delta : acc.balance + delta;
+                }
+            } else if (targetType === 'CARD') {
+                const card = state.creditCards.find(c => c.id === targetId);
+                if (card) {
+                    accountName = card.name;
+                    const delta = convertCurrency(amount, currency, card.currency);
+                    card.balance = type === 'EXPENSE' ? card.balance + delta : Math.max(0, card.balance - delta);
+                    if (type === 'EXPENSE') card.paidThisMonth = false;
+                }
+            }
+
+            state.transactions.unshift({
+                id: 'tx-' + Date.now(),
+                title,
+                category,
+                type,
+                city: city === 'US' ? 'HK' : city,
+                currency,
+                amount,
+                accountName,
+                date: '10月15日'
+            });
+
+            saveState();
+            renderAll();
+            closeModal('tx-modal');
+            e.target.reset();
+            showToast('收支記錄已儲存並同步更新戶口餘額');
+        }
+
+        function openPayCardModal(cardId) {
+            const card = state.creditCards.find(c => c.id === cardId);
+            if (!card) return;
+            document.getElementById('pay-card-id').value = card.id;
+            document.getElementById('pay-card-name').textContent = card.name;
+            document.getElementById('pay-card-bill-info').textContent = `本期應還結欠: ${formatMoney(card.balance, card.currency)}`;
+            document.getElementById('pay-card-curr-badge').textContent = card.currency;
+            document.getElementById('pay-card-amount').value = card.balance;
+
+            const srcSelect = document.getElementById('pay-card-source-acc');
+            srcSelect.innerHTML = state.accounts.map(a =>
+                `<option value="${a.id}" ${a.currency === card.currency ? 'selected' : ''}>${a.name} (餘額: ${formatMoney(a.balance, a.currency)})</option>`
+            ).join('');
+
+            openModal('pay-card-modal');
+        }
+
+        function handleConfirmCardPayment(e) {
+            e.preventDefault();
+            const cardId = document.getElementById('pay-card-id').value;
+            const payAmount = parseFloat(document.getElementById('pay-card-amount').value);
+            const srcAccId = document.getElementById('pay-card-source-acc').value;
+
+            const card = state.creditCards.find(c => c.id === cardId);
+            const acc = state.accounts.find(a => a.id === srcAccId);
+            if (!card || !acc || !payAmount || payAmount <= 0) return;
+
+            const deductedInAccCurr = convertCurrency(payAmount, card.currency, acc.currency);
+            acc.balance = Math.max(0, acc.balance - deductedInAccCurr);
+            card.balance = Math.max(0, card.balance - payAmount);
+            if (card.balance <= 0.5) {
+                card.balance = 0;
+                card.paidThisMonth = true;
+            }
+
+            state.transfers.unshift({
+                id: 'tf-' + Date.now(),
+                fromName: acc.name,
+                toName: card.name,
+                fromCurr: acc.currency,
+                toCurr: card.currency,
+                fromAmount: Math.round(deductedInAccCurr),
+                toAmount: Math.round(payAmount),
+                note: '信用卡賬單還款',
+                date: '10月15日'
+            });
+
+            saveState();
+            renderAll();
+            closeModal('pay-card-modal');
+            showToast(`已成功償還 ${card.name} 賬單`);
+        }
+
+        function resetCardBill(cardId) {
+            const card = state.creditCards.find(c => c.id === cardId);
+            if (!card) return;
+            card.balance = card.currency === 'HKD' ? 3200 : 1850;
+            card.paidThisMonth = false;
+            saveState();
+            renderAll();
+            showToast(`已模擬生成 ${card.name} 新一期月結單`);
+        }
+
+        function handleAddCard(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-card-name').value.trim();
+            const last4 = document.getElementById('new-card-last4').value.trim();
+            const currency = document.getElementById('new-card-curr').value;
+            const limit = parseFloat(document.getElementById('new-card-limit').value);
+            const dueDay = parseInt(document.getElementById('new-card-dueday').value, 10);
+            const balance = parseFloat(document.getElementById('new-card-balance').value);
+            const perk = document.getElementById('new-card-perk').value.trim();
+
+            state.creditCards.unshift({
+                id: 'card-' + Date.now(),
+                name,
+                last4,
+                region: currency === 'CNY' ? 'SZ' : 'HK',
+                currency,
+                balance,
+                limit,
+                dueDay,
+                perk,
+                paidThisMonth: balance <= 0,
+                color: 'from-indigo-900/80 to-slate-900'
+            });
+
+            saveState();
+            renderAll();
+            closeModal('add-card-modal');
+            e.target.reset();
+            showToast(`已新增信用卡：${name}`);
+        }
+
+        function populateTransferDropdowns() {
+            const fromSel = document.getElementById('tf-from-acc');
+            const toSel = document.getElementById('tf-to-acc');
+            const html = state.accounts.map(a => `<option value="${a.id}">${a.name} (${a.currency})</option>`).join('');
+            fromSel.innerHTML = html;
+            toSel.innerHTML = html;
+            if (state.accounts.length > 1) {
+                toSel.selectedIndex = 3; // Default to SZ CMB
+            }
+        }
+
+        function updateTransferPreview() {
+            const fromId = document.getElementById('tf-from-acc').value;
+            const toId = document.getElementById('tf-to-acc').value;
+            const amt = parseFloat(document.getElementById('tf-amount').value) || 0;
+
+            const fromAcc = state.accounts.find(a => a.id === fromId);
+            const toAcc = state.accounts.find(a => a.id === toId);
+            if (!fromAcc || !toAcc) return;
+
+            const converted = convertCurrency(amt, fromAcc.currency, toAcc.currency);
+            document.getElementById('tf-target-preview').value = `${getCurrencySymbol(toAcc.currency)} ${converted.toFixed(2)}`;
+        }
+
+        function handleTransferSubmit(e) {
+            e.preventDefault();
+            const fromId = document.getElementById('tf-from-acc').value;
+            const toId = document.getElementById('tf-to-acc').value;
+            const amt = parseFloat(document.getElementById('tf-amount').value);
+            const note = document.getElementById('tf-note').value.trim();
+
+            if (fromId === toId) {
+                showToast('請選擇不同的轉出與轉入戶口');
+                return;
+            }
+
+            const fromAcc = state.accounts.find(a => a.id === fromId);
+            const toAcc = state.accounts.find(a => a.id === toId);
+            if (!fromAcc || !toAcc || !amt || amt <= 0) return;
+
+            const targetAmt = convertCurrency(amt, fromAcc.currency, toAcc.currency);
+            fromAcc.balance = Math.max(0, fromAcc.balance - amt);
+            toAcc.balance += targetAmt;
+
+            state.transfers.unshift({
+                id: 'tf-' + Date.now(),
+                fromName: fromAcc.name,
+                toName: toAcc.name,
+                fromCurr: fromAcc.currency,
+                toCurr: toAcc.currency,
+                fromAmount: Math.round(amt),
+                toAmount: Math.round(targetAmt),
+                note,
+                date: '10月15日'
+            });
+
+            saveState();
+            renderAll();
+            closeModal('transfer-modal');
+            e.target.reset();
+            showToast('跨境/戶口轉賬已完成並更新資產流水');
+        }
+
+        function handleOptMarketChange() {
+            const market = document.getElementById('opt-market').value;
+            const brokerSel = document.getElementById('opt-broker-acc');
+            if (market === 'HK') {
+                brokerSel.value = 'futu-hk';
+            } else {
+                brokerSel.value = 'ibkr-pro';
+            }
+            calcOptPreview();
+        }
+
+        function calcOptPreview() {
+            const market = document.getElementById('opt-market').value;
+            const curr = market === 'US' ? 'USD' : 'HKD';
+            const sym = getCurrencySymbol(curr);
+            const strike = parseFloat(document.getElementById('opt-strike').value) || 0;
+            const contracts = parseInt(document.getElementById('opt-contracts').value, 10) || 1;
+            const mult = parseInt(document.getElementById('opt-multiplier').value, 10) || 100;
+            const openPrem = parseFloat(document.getElementById('opt-open-prem').value) || 0;
+            const strat = document.getElementById('opt-strategy').value;
+
+            const totalCredit = openPrem * contracts * mult;
+            const collateral = strike * contracts * mult;
+            const be = strat === 'SHORT_PUT' ? (strike - openPrem) : (strike + openPrem);
+
+            document.getElementById('opt-preview-credit').textContent = `+${sym}${totalCredit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('opt-preview-collateral').textContent = `${sym}${collateral.toLocaleString()} | BE: ${sym}${be.toFixed(2)}`;
+        }
+
+        function handleAddOption(e) {
+            e.preventDefault();
+            const market = document.getElementById('opt-market').value;
+            const currency = market === 'US' ? 'USD' : 'HKD';
+            const ticker = document.getElementById('opt-ticker').value.trim().toUpperCase();
+            const strategy = document.getElementById('opt-strategy').value;
+            const strike = parseFloat(document.getElementById('opt-strike').value);
+            const contracts = parseInt(document.getElementById('opt-contracts').value, 10);
+            const multiplier = parseInt(document.getElementById('opt-multiplier').value, 10);
+            const openPremium = parseFloat(document.getElementById('opt-open-prem').value);
+            const currentPremium = parseFloat(document.getElementById('opt-curr-prem').value);
+            const delta = parseFloat(document.getElementById('opt-delta').value) || -0.20;
+            const expiry = document.getElementById('opt-expiry').value;
+            const brokerId = document.getElementById('opt-broker-acc').value;
+
+            const newOpt = {
+                id: 'opt-' + Date.now(),
+                market,
+                ticker,
+                name: ticker,
+                strategy,
+                strike,
+                expiry,
+                contracts,
+                multiplier,
+                currency,
+                openPremium,
+                currentPremium,
+                delta,
+                status: 'OPEN',
+                brokerId
+            };
+
+            state.options.unshift(newOpt);
+
+            // Credit the collected option premium to the selected broker account
+            const brokerAcc = state.accounts.find(a => a.id === brokerId);
+            const totalCredit = openPremium * contracts * multiplier;
+            if (brokerAcc) {
+                brokerAcc.balance += convertCurrency(totalCredit, currency, brokerAcc.currency);
+            }
+
+            saveState();
+            renderAll();
+            closeModal('option-modal');
+            e.target.reset();
+            showToast(`已開倉 ${ticker} $${strike} ${strategy === 'SHORT_PUT' ? 'Short Put' : 'Short Call'}，權利金已入賬`);
+        }
+
+        function closeOptionPosition(optId, actionType) {
+            const opt = state.options.find(o => o.id === optId);
+            if (!opt) return;
+
+            if (actionType === 'TAKE_PROFIT') {
+                opt.status = 'CLOSED';
+                showToast(`${opt.ticker} $${opt.strike} 已止盈平倉，鎖定權利金利潤！`);
+            } else if (actionType === 'ASSIGNED') {
+                opt.status = 'ASSIGNED';
+                opt.currentPremium = 0;
+                showToast(`${opt.ticker} 已於 $${opt.strike} 接貨轉為正股，可準備開立 Covered Call！`);
+            }
+
+            saveState();
+            renderAll();
+        }
+
+        function handleSaveFX(e) {
+            e.preventDefault();
+            const cnyHkd = parseFloat(document.getElementById('fx-cny-hkd').value);
+            const usdHkd = parseFloat(document.getElementById('fx-usd-hkd').value);
+            if (cnyHkd > 0 && usdHkd > 0) {
+                state.fx.CNY_TO_HKD = cnyHkd;
+                state.fx.USD_TO_HKD = usdHkd;
+                saveState();
+                renderAll();
+                closeModal('fx-modal');
+                showToast('跨境匯率已更新，所有資產已重新折算');
+            }
+        }
+
+        function handleSaveBudget(e) {
+            e.preventDefault();
+            const szLim = parseFloat(document.getElementById('input-sz-budget').value);
+            const hkLim = parseFloat(document.getElementById('input-hk-budget').value);
+            if (szLim > 0 && hkLim > 0) {
+                state.budgets.szMonthlyCNY = szLim;
+                state.budgets.hkMonthlyHKD = hkLim;
+                saveState();
+                renderAll();
+                closeModal('budget-modal');
+                showToast('深港雙城月度預算已更新');
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('ios-clock').textContent = `${hh}:${mm}`;
+        }
+
+        function renderAll() {
+            renderHeroAndGlobalStats();
+            renderLivingTab();
+            renderCreditCardsTab();
+            renderAssetsTab();
+            renderOptionsTab();
+            lucide.createIcons();
+        }
+
+        Object.assign(window, {
+            openModal,
+            closeModal,
+            cycleBaseCurrency,
+            togglePrivacy,
+            setTxFilter,
+            setOptFilter,
+            quickRecordExpense,
+            handleSaveTx,
+            openPayCardModal,
+            handleConfirmCardPayment,
+            resetCardBill,
+            handleAddCard,
+            updateTransferPreview,
+            handleTransferSubmit,
+            handleOptMarketChange,
+            calcOptPreview,
+            handleAddOption,
+            closeOptionPosition,
+            handleSaveFX,
+            handleSaveBudget,
+            switchTab,
+            switchCloudMode,
+            copyShareLink,
+            copyUserId,
+            triggerNativeShare,
+            resetDemoData,
+            updateGitHubPagesUrl,
+            downloadStandaloneHTML,
+            copyGitCliCommands,
+            exportLedgerJSON,
+            importLedgerJSON
+        });
+
+        window.onload = function () {
+            updateClock();
+            setInterval(updateClock, 30000);
+            renderAll();
+            initCloudSync();
+        };
+    </script>
+</body>
+</html>
